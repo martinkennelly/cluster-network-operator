@@ -117,3 +117,25 @@ spec:
       for: 5m
       labels:
         severity: warning
+    - alert: OVNKubernetesNorthboundDatabaseTermLag
+      annotations:
+        summary: OVN northbound databases RAFT term have not been equal for a period of time.
+        description: OVN northbound database(s) RAFT term have not been equal which may indicate degraded OVN database high availability.
+      expr: |
+        # Without max_over_time, failed scrapes could create false negatives, see
+        # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
+        max(max_over_time(ovn_db_cluster_term{db_name="OVN_Northbound"}[5m])) - min(max_over_time(ovn_db_cluster_term{db_name="OVN_Northbound"}[5m])) > 0
+      for: 25m
+      labels:
+        severity: warning
+    - alert: OVNKubernetesSouthboundDatabaseTermLag
+      annotations:
+        summary: OVN southbound databases RAFT term have not been equal for a period of time.
+        description: OVN southbound database(s) RAFT term have not been equal which may indicate degraded OVN database high availability.
+      expr: |
+        # Without max_over_time, failed scrapes could create false negatives, see
+        # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
+        max(max_over_time(ovn_db_cluster_term{db_name="OVN_Southbound"}[5m])) - min(max_over_time(ovn_db_cluster_term{db_name="OVN_Southbound"}[5m])) > 0
+      for: 25m
+      labels:
+        severity: warning
