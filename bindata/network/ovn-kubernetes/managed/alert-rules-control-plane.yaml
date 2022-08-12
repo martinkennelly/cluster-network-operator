@@ -16,7 +16,7 @@ spec:
     - record: cluster:ovnkube_master_egress_routing_via_host:max
       expr: max(ovnkube_master_egress_routing_via_host)
 
-      # OVN kubernetes master functional alerts
+     # OVN kubernetes master functional alerts
     - alert: NoRunningOvnMaster
       annotations:
         summary: There is no running ovn-kubernetes master.
@@ -62,7 +62,7 @@ spec:
       labels:
         severity: warning
 
-      # OVN northbound and southbound databases functional alerts
+    # OVN northbound and southbound databases functional alerts
     - alert: NorthboundStale
       annotations:
         summary: ovn-kubernetes has not written anything to the northbound database for too long.
@@ -91,5 +91,29 @@ spec:
         # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
         max_over_time(ovnkube_master_nb_e2e_timestamp[5m]) - max_over_time(ovnkube_master_sb_e2e_timestamp[5m]) > 120
       for: 10m
+      labels:
+        severity: warning
+    - alert: OVNKubernetesNorthboundDatabaseClusterIDError
+      annotations:
+        summary: Multiple OVN northbound database cluster IDs exist.
+        description: More than one OVN northbound database cluster ID indicates degraded OVN database high availability
+          and possible database split brain.
+      expr: |
+        # Without min_over_time, failed scrapes could create false negatives, see
+        # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
+        count(count(min_over_time(ovn_db_cluster_id{db_name="OVN_Northbound"}[5m])) by (cluster_id)) > 1
+      for: 5m
+      labels:
+        severity: warning
+    - alert: OVNKubernetesSouthboundDatabaseClusterIDError
+      annotations:
+        summary: Multiple OVN southbound database cluster IDs exist.
+        description: More than one OVN southbound database cluster ID indicates degraded OVN database high availability
+          and possible database split brain.
+      expr: |
+        # Without max_over_time, failed scrapes could create false negatives, see
+        # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
+        count(count(min_over_time(ovn_db_cluster_id{db_name="OVN_Southbound"}[5m])) by (cluster_id)) > 1
+      for: 5m
       labels:
         severity: warning
