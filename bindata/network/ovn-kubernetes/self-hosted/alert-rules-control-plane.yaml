@@ -316,3 +316,15 @@ spec:
       for: 5m
       labels:
         severity: warning
+    # OVN northd functional alerts
+    - alert: OVNKubernetesNorthdInactive
+      annotations:
+        summary: No OVN northd is active. Networking is degraded.
+        description: No OVN northd is available within the high availability set. Networking control plane is degraded.
+      expr: |
+        # Without max_over_time, failed scrapes could create false negatives, see
+        # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
+        sum(max_over_time(ovn_northd_status[5m])) == 0
+      for: 5m
+      labels:
+        severity: critical
