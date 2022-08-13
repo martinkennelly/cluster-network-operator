@@ -326,6 +326,15 @@ spec:
       for: 5m
       labels:
         severity: critical
+    # OVN northd performance alerts
+    - alert: OVNKubernetesNorthdCPUUsageHigh
+      annotations:
+        summary: OVN northd {{ $labels.instance }} is greater than {{ $value }} percent CPU usage for a period of time.
+        description: High OVN northd CPU usage indicates high load on the networking control plane.
+      expr: (sum(rate(container_cpu_usage_seconds_total{container="northd"}[5m])) BY (instance, name) * 100) > 80
+      for: 10m
+      labels:
+        severity: info
     # OVN kubernetes node functional alerts
     - alert: NodeWithoutOVNKubeNodePodRunning
       annotations:
