@@ -319,7 +319,7 @@ spec:
     # OVN northbound and southbound database performance alerts
     - alert: OVNKubernetesNorthboundDatabaseCPUUsageHigh
       annotations:
-        summary: OVN northbound database {{ $labels.instance }} is greater than {{ $value }} percent CPU usage for a period of time.
+        summary: OVN northbound database {{"{{"}} $labels.instance {{"}}"}} is greater than {{"{{"}} $value {{"}}"}} percent CPU usage for a period of time.
         description: High OVN northbound CPU usage indicates high load on the networking control plane.
       expr: (sum(rate(container_cpu_usage_seconds_total{container="nbdb"}[5m])) BY (instance, name) * 100) > 80
       for: 15m
@@ -327,7 +327,7 @@ spec:
         severity: info
     - alert: OVNKubernetesSouthboundDatabaseCPUUsageHigh
       annotations:
-        summary: OVN southbound database {{ $labels.instance }} is greater than {{ $value }} percent CPU usage for a period of time.
+        summary: OVN southbound database {{"{{"}} $labels.instance {{"}}"}} is greater than {{"{{"}} $value {{"}}"}} percent CPU usage for a period of time.
         description: High OVN southbound CPU usage indicates high load on the networking control plane.
       expr: (sum(rate(container_cpu_usage_seconds_total{container="sbdb"}[5m])) BY (instance, name) * 100) > 80
       for: 15m
@@ -348,7 +348,7 @@ spec:
     # OVN northd performance alerts
     - alert: OVNKubernetesNorthdCPUUsageHigh
       annotations:
-        summary: OVN northd {{ $labels.instance }} is greater than {{ $value }} percent CPU usage for a period of time.
+        summary: OVN northd {{"{{"}} $labels.instance {{"}}"}} is greater than {{"{{"}} $value {{"}}"}} percent CPU usage for a period of time.
         description: High OVN northd CPU usage indicates high load on the networking control plane.
       expr: (sum(rate(container_cpu_usage_seconds_total{container="northd"}[5m])) BY (instance, name) * 100) > 80
       for: 10m
