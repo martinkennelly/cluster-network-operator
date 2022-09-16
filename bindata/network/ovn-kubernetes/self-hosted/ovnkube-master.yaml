@@ -394,9 +394,11 @@ spec:
               if [[ ! -z "${leader_status}" ]]; then
                 echo "NB DB Raft leader is unknown to the cluster node."
                 exit 1
-              else
-                /usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
               fi
+              if [[ ! "{{.OVN_NB_DB_LIST}}" =~ .*":${K8S_NODE_IP}:".* ]] && [[ ! "{{.OVN_NB_DB_LIST}}" =~ .*":[${K8S_NODE_IP}]:".* ]]; then
+                exit 0
+              fi
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
 
         env:
         - name: OVN_LOG_LEVEL
@@ -716,9 +718,11 @@ spec:
               if [[ ! -z "${leader_status}" ]]; then
                 echo "SB DB Raft leader is unknown to the cluster node."
                 exit 1
-              else
-                /usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
               fi
+              if [[ ! "{{.OVN_SB_DB_LIST}}" =~ .*":${K8S_NODE_IP}:".* ]] && [[ ! "{{.OVN_SB_DB_LIST}}" =~ .*":[${K8S_NODE_IP}]:".* ]]; then
+                exit 0
+              fi
+              /usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
         env:
         - name: OVN_LOG_LEVEL
           value: info 
