@@ -205,6 +205,17 @@ spec:
           }
           # end of cluster_exists()
 
+          # wait forever doing nothing if this DB is not supposed to be part of the cluster
+          if [[ ! "{{.OVN_NB_DB_LIST}}" =~ .*":${K8S_NODE_IP}:".* ]] && [[ ! "{{.OVN_NB_DB_LIST}}" =~ .*":[${K8S_NODE_IP}]:".* ]]; then
+            sleep 1500d
+            exit 0
+          fi
+
+          # Make cluster upgrades on DB start wait longer; different RAFT member
+          # pods start on different nodes at different times and it can take a
+          # while for the cluster to form
+          sed -ie 's/t 30 wait/t 300 wait/g' /usr/share/openvswitch/scripts/ovs-lib
+
           OVN_ARGS="--db-nb-cluster-local-port={{.OVN_NB_RAFT_PORT}} \
             --db-nb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
             --no-monitor \
@@ -555,6 +566,17 @@ spec:
             return 1
           }
           # end of cluster_exists()
+
+          # wait forever doing nothing if this DB is not supposed to be part of the cluster
+          if [[ ! "{{.OVN_SB_DB_LIST}}" =~ .*":${K8S_NODE_IP}:".* ]] && [[ ! "{{.OVN_SB_DB_LIST}}" =~ .*":[${K8S_NODE_IP}]:".* ]]; then
+            sleep 1500d
+            exit 0
+          fi
+
+          # Make cluster upgrades on DB start wait longer; different RAFT member
+          # pods start on different nodes at different times and it can take a
+          # while for the cluster to form
+          sed -ie 's/t 30 wait/t 300 wait/g' /usr/share/openvswitch/scripts/ovs-lib
 
           OVN_ARGS="--db-sb-cluster-local-port={{.OVN_SB_RAFT_PORT}} \
             --db-sb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
